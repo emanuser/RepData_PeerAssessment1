@@ -4,22 +4,106 @@ output:
   html_document:
     keep_md: true
 ---
-
+```{r}
+require(dplyr)
+require(data.table)
+require(ggplot2)
+require(lattice)
+require(latticeExtra)
+require(knitr)
+```
 
 ## Loading and preprocessing the data
+```{r, echo=TRUE}
+##Load & process the data
+activ_data <- read.csv("activity.csv")
+activ_data$date <- as.Date(activ_data$date, "%Y-%m-%d")
+```
 
 
 
-## What is mean total number of steps taken per day?
+##Calculate the total number of steps taken per day
+```{r, echo=TRUE}
+steps_day <- aggregate(steps ~ date, activ_data, sum)
+steps_day
+```
 
 
 
-## What is the average daily activity pattern?
+##Make a histogram of the total number of steps taken each day
+```{r, echo=TRUE}
+hist(steps_day$steps)
+```
 
+##Summary statistics to claculate the mean and median of the total number of steps taken per day
+```{r, echo=TRUE}
+summary(steps_day$steps)
 
+```
+
+## 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps
+```{r, echo=TRUE}
+dt = data.table(activ_data) ###Copy original data and convert to data table
+dt[, steps.mean := mean(steps, na.rm = T), by = interval] ###Add columen with mean steps acrose all days by time interval
+interval_ave_max <- filter(dt, max(steps.mean)  == steps.mean) ### Use dplyr to subset table by max mean steps
+unique(interval_ave_max$interval) ### 5-minute interval corasponding to max mean
+```
+
+## Calculate and report the total number of missing values in the datase
+```{r, echo=TRUE}
+sum(is.na(activ_data))
+```
 
 ## Imputing missing values
+## New dataset with missing values filled in with mean for that 5-minute interval
+```{r, echo=TRUE}
+no_missing_values  <- as_data_frame(dt) ###Transform table in to dataframe
+
+for(i in 1:17568) { ### for loop to replace missing values
+  if(is.na(no_missing_values$steps[i])){
+    no_missing_values$steps[i] = no_missing_values$steps.mean[i]
+  }else(no_missing_values$steps[i] = no_missing_values$steps[i])
+}
+```
 
 
 
-## Are there differences in activity patterns between weekdays and weekends?
+
+```{r, echo=TRUE}
+##Calculate the total number of steps taken per day
+steps_day_2 <- aggregate(steps ~ date, no_missing_values, sum)  
+
+##Make a histogram of the total number of steps taken each day
+hist(steps_day_2$steps)
+
+##Compare with summary statistics after imputing missing values
+summary(steps_day_2$steps)
+summary(steps_day$steps)
+
+
+```
+
+##  Differences in activity patterns between weekdays and weekends
+```{r, echo=TRUE}
+##Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
+day_of_week <- weekdays(no_missing_values$date)
+day_of_week <- as.data.frame(day_of_week) ### convert to data dataframe 
+week_day_end <- gsub("Saturday|Sunday", "weekend", day_of_week[,1]) ### serch for days corisponding to weekend and replace 
+week_day_end <- gsub("Monday|Tuesday|Wednesday|Thursday|Friday", "weekday", week_day_end) ### serch for days corisponding to weekday and replace 
+
+with_Day_column <-  data.frame(no_missing_values, week_day_end) ### bind sepret data frames in to one table
+#with_Day_column <- as.data.frame(with_Day_column)
+
+with_Day_column_2 <- aggregate(steps ~ week_day_end+interval, with_Day_column, mean) ### average number of steps across all weekday days or weekend days
+
+ggplot(with_Day_column_2, aes(x=interval , y=steps, color = week_day_end))+
+  geom_line(size=1)+
+  facet_grid( week_day_end~. )+
+  ggtitle("Average Number of Steps in Five Minute Intervals")
+
+xyplot(steps ~ interval | week_day_end,  data = with_Day_column_2,
+       ylab = "Mean Steps", xlab = "Interval", main = "Average Number of Steps in Five Minute Intervals",
+       type = "l", lty = 1, col = "black", layout = c(1, 2), lattice.options = theEconomist.opts())
+
+```
+
