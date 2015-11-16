@@ -153,7 +153,7 @@ steps_day
 hist(steps_day$steps)
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
+![](https://github.com/emanuser/RepData_PeerAssessment1/blob/master/instructions_fig/unnamed-chunk-4-1.png) 
 
 ##Summary statistics to claculate the mean and median of the total number of steps taken per day
 
