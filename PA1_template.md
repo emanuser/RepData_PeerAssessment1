@@ -214,7 +214,7 @@ steps_day_2 <- aggregate(steps ~ date, no_missing_values, sum)
 hist(steps_day_2$steps)
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-9-1.png) 
+![](https://github.com/emanuser/RepData_PeerAssessment1/blob/master/instructions_fig/unnamed-chunk-9-1.png) 
 
 ```r
 ##Compare with summary statistics after imputing missing values
@@ -255,7 +255,7 @@ ggplot(with_Day_column_2, aes(x=interval , y=steps, color = week_day_end))+
   ggtitle("Average Number of Steps in Five Minute Intervals")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-10-1.png) 
+![](https://github.com/emanuser/RepData_PeerAssessment1/blob/master/instructions_fig/unnamed-chunk-10-1.png) 
 
 ```r
 xyplot(steps ~ interval | week_day_end,  data = with_Day_column_2,
@@ -263,5 +263,5 @@ xyplot(steps ~ interval | week_day_end,  data = with_Day_column_2,
        type = "l", lty = 1, col = "black", layout = c(1, 2), lattice.options = theEconomist.opts())
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-10-2.png) 
+![](https://github.com/emanuser/RepData_PeerAssessment1/blob/master/instructions_fig/unnamed-chunk-10-2.png) 
 
